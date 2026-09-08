@@ -1,17 +1,14 @@
 #!/usr/bin/env node
 /** Build the checked-in provider packages from source/radical-diagram. */
-import { cp, mkdir, readFile, writeFile } from 'node:fs/promises'
+import { cp, mkdir, writeFile } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const source = path.join(repoRoot, 'source', 'radical-diagram')
-const sourceSkill = await readFile(path.join(source, 'SKILL.md'), 'utf8')
-
 const packages = [
   {
     id: 'claude-code',
-    root: '${CLAUDE_PLUGIN_ROOT}',
     directory: path.join(repoRoot, 'providers', 'claude-code', 'radical-diagram'),
     manifestPath: '.claude-plugin/plugin.json',
     manifest: {
@@ -26,7 +23,6 @@ const packages = [
   },
   {
     id: 'copilot',
-    root: '${PLUGIN_ROOT}',
     directory: path.join(repoRoot, 'providers', 'copilot', 'radical-diagram'),
     manifestPath: 'plugin.json',
     manifest: {
@@ -43,7 +39,6 @@ const packages = [
   },
   {
     id: 'codex',
-    root: '${PLUGIN_ROOT}',
     directory: path.join(repoRoot, 'plugins', 'radical-diagram'),
     manifestPath: '.codex-plugin/plugin.json',
     manifest: {
@@ -72,6 +67,9 @@ const packages = [
 for (const target of packages) {
   const skillDirectory = path.join(target.directory, 'skills', 'radical-diagram')
   await mkdir(skillDirectory, { recursive: true })
+  await cp(path.join(source, 'SKILL.md'), path.join(skillDirectory, 'SKILL.md'), {
+    force: true,
+  })
   await cp(path.join(source, 'references'), path.join(skillDirectory, 'references'), {
     recursive: true,
     force: true,
@@ -83,11 +81,6 @@ for (const target of packages) {
   await cp(path.join(repoRoot, 'LICENSE'), path.join(target.directory, 'LICENSE'), {
     force: true,
   })
-  const skill = sourceSkill.replace(
-    'node .claude/skills/radical-diagram/scripts/validate.mjs <file>',
-    `node "${target.root}/skills/radical-diagram/scripts/validate.mjs" <file>`,
-  )
-  await writeFile(path.join(skillDirectory, 'SKILL.md'), skill)
   const manifest = path.join(target.directory, target.manifestPath)
   await mkdir(path.dirname(manifest), { recursive: true })
   await writeFile(manifest, `${JSON.stringify(target.manifest, null, 2)}\n`)

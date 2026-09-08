@@ -11,14 +11,15 @@ const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'
 const source = path.join(repoRoot, 'source', 'radical-diagram')
 const license = await readFile(path.join(repoRoot, 'LICENSE'), 'utf8')
 const targets = [
-  ['Claude Code', 'providers/claude-code/radical-diagram', '.claude-plugin/plugin.json', '${CLAUDE_PLUGIN_ROOT}'],
-  ['GitHub Copilot CLI', 'providers/copilot/radical-diagram', 'plugin.json', '${PLUGIN_ROOT}'],
-  ['Codex', 'plugins/radical-diagram', '.codex-plugin/plugin.json', '${PLUGIN_ROOT}'],
+  ['Claude Code', 'providers/claude-code/radical-diagram', '.claude-plugin/plugin.json'],
+  ['GitHub Copilot CLI', 'providers/copilot/radical-diagram', 'plugin.json'],
+  ['Codex', 'plugins/radical-diagram', '.codex-plugin/plugin.json'],
 ]
+const canonicalSkill = await readFile(path.join(source, 'SKILL.md'), 'utf8')
 const canonicalReference = await readFile(path.join(source, 'references/radical-file-format.md'), 'utf8')
 const canonicalValidator = await readFile(path.join(source, 'scripts/validate.mjs'), 'utf8')
 
-for (const [provider, relativeDir, manifestRelativePath, pluginRoot] of targets) {
+for (const [provider, relativeDir, manifestRelativePath] of targets) {
   const directory = path.join(repoRoot, relativeDir)
   const manifest = JSON.parse(await readFile(path.join(directory, manifestRelativePath), 'utf8'))
   assert.equal(manifest.name, 'radical-diagram', `${provider}: plugin name`)
@@ -26,7 +27,7 @@ for (const [provider, relativeDir, manifestRelativePath, pluginRoot] of targets)
   assert.ok(manifest.description, `${provider}: description`)
   assert.equal(await readFile(path.join(directory, 'LICENSE'), 'utf8'), license, `${provider}: license sync`)
   const skill = await readFile(path.join(directory, 'skills/radical-diagram/SKILL.md'), 'utf8')
-  assert.match(skill, new RegExp(`node "\\$\\{${pluginRoot.slice(2, -1)}\\}/skills/radical-diagram/scripts/validate\\.mjs"`), `${provider}: packaged validator path`)
+  assert.equal(skill, canonicalSkill, `${provider}: skill sync`)
   assert.equal(await readFile(path.join(directory, 'skills/radical-diagram/references/radical-file-format.md'), 'utf8'), canonicalReference, `${provider}: reference sync`)
   assert.equal(await readFile(path.join(directory, 'skills/radical-diagram/scripts/validate.mjs'), 'utf8'), canonicalValidator, `${provider}: validator sync`)
 }

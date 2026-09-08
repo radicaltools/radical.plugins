@@ -13,7 +13,7 @@ A `.radical` file is a JSON document (`DiagramData` in `src/renderer/src/types/c
 2. Pick node types respecting the containment rules below.
 3. Compute simple positions (layered top-down layout, see Positioning).
 4. Emit the JSON file with a `.radical` extension.
-5. Validate: `node "${CLAUDE_PLUGIN_ROOT}/skills/radical-diagram/scripts/validate.mjs" <file>`. Fix every reported error before delivering the file.
+5. Validate with the script bundled alongside this skill. Example: `node <plugin-root>/skills/radical-diagram/scripts/validate.mjs <file.radical>`. Resolve `<plugin-root>` to this installed plugin's directory. Fix every reported error before delivering the file.
 
 ## Minimal file shape
 
