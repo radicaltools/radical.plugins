@@ -1,0 +1,18 @@
+{
+  "name": "radical-diagram",
+  "description": "Create and validate .radical C4 architecture diagrams for radical.tools.",
+  "version": "0.1.0",
+  "author": {
+    "name": "radical.tools"
+  },
+  "license": "MIT",
+  "homepage": "https://radical.tools",
+  "repository": "https://github.com/radicaltools/radical.plugins",
+  "keywords": [
+    "radical.tools",
+    "c4",
+    "architecture",
+    "diagram"
+  ],
+  "skills": "./skills/"
+}
